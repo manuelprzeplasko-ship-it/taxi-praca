@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Formularz aplikacyjny do pracy">
+  <title>Formularz przyjęcia do pracy</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f6f8;
+      color: #1f2937;
+      line-height: 1.5;
+    }
+    .container {
+      width: min(760px, calc(100% - 32px));
+      margin: 48px auto;
+    }
+    .card {
+      background: #fff;
+      border-radius: 18px;
+      padding: 32px;
+      box-shadow: 0 12px 35px rgba(0,0,0,.08);
+    }
+    h1 { margin: 0 0 8px; font-size: 30px; }
+    .intro { margin: 0 0 28px; color: #6b7280; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    .field { margin-bottom: 18px; }
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: 700;
+    }
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font: inherit;
+      background: #fff;
+      outline: none;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: #111827;
+      box-shadow: 0 0 0 3px rgba(17,24,39,.08);
+    }
+    textarea { min-height: 130px; resize: vertical; }
+    .help {
+      display: block;
+      margin-top: 6px;
+      color: #6b7280;
+      font-size: 13px;
+    }
+    .consent {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 8px 0 22px;
+      font-size: 14px;
+    }
+    .consent input {
+      width: auto;
+      margin-top: 4px;
+    }
+    button {
+      width: 100%;
+      border: 0;
+      border-radius: 10px;
+      padding: 14px 18px;
+      background: #111827;
+      color: white;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    button:hover { opacity: .92; }
+    button:disabled { opacity: .55; cursor: not-allowed; }
+    #status {
+      display: none;
+      margin-top: 18px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+    #status.success { display:block; background:#ecfdf5; color:#065f46; }
+    #status.error { display:block; background:#fef2f2; color:#991b1b; }
+    .required { color: #b91c1c; }
+    @media (max-width: 650px) {
+      .container { margin: 20px auto; }
+      .card { padding: 22px; }
+      .grid { grid-template-columns: 1fr; gap: 0; }
+      h1 { font-size: 25px; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+    <section class="card">
+      <h1>Formularz przyjęcia do pracy</h1>
+      <p class="intro">Wypełnij formularz. Po wysłaniu zgłoszenie zostanie przekazane przez EmailJS.</p>
+
+      <form id="job-form">
+        <div class="grid">
+          <div class="field">
+            <label for="first_name">Imię <span class="required">*</span></label>
+            <input id="first_name" name="first_name" type="text" autocomplete="given-name" required>
+          </div>
+
+          <div class="field">
+            <label for="last_name">Nazwisko <span class="required">*</span></label>
+            <input id="last_name" name="last_name" type="text" autocomplete="family-name" required>
+          </div>
+
+          <div class="field">
+            <label for="email">E-mail <span class="required">*</span></label>
+            <input id="email" name="email" type="email" autocomplete="email" required>
+          </div>
+
+          <div class="field">
+            <label for="phone">Telefon <span class="required">*</span></label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="position">Stanowisko, na które aplikujesz <span class="required">*</span></label>
+          <input id="position" name="position" type="text" required>
+        </div>
+
+        <div class="grid">
+          <div class="field">
+            <label for="availability">Dostępność od</label>
+            <input id="availability" name="availability" type="date">
+          </div>
+
+          <div class="field">
+            <label for="experience">Doświadczenie</label>
+            <select id="experience" name="experience">
+              <option value="">Wybierz</option>
+              <option>Brak doświadczenia</option>
+              <option>Do 1 roku</option>
+              <option>1–3 lata</option>
+              <option>3–5 lat</option>
+              <option>Powyżej 5 lat</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="message">Kilka słów o sobie</label>
+          <textarea id="message" name="message" placeholder="Napisz krótko o swoim doświadczeniu, umiejętnościach lub motywacji."></textarea>
+        </div>
+
+        <label class="consent">
+          <input type="checkbox" name="consent" value="Wyrażono zgodę" required>
+          <span>Wyrażam zgodę na przetwarzanie danych przekazanych w formularzu w celu przeprowadzenia procesu rekrutacji. <span class="required">*</span></span>
+        </label>
+
+        <input type="hidden" name="form_name" value="Formularz przyjęcia do pracy">
+        <input type="hidden" id="submitted_at" name="submitted_at">
+
+        <button id="submit-btn" type="submit">Wyślij zgłoszenie</button>
+        <div id="status" role="status" aria-live="polite"></div>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    const SERVICE_ID = "service_g2vzfht";
+    const TEMPLATE_ID = "template_8te9aos";
+    const PUBLIC_KEY = "5KvyyUC8LRY6rOq3H";
+
+    emailjs.init({ publicKey: PUBLIC_KEY });
+
+    const form = document.getElementById("job-form");
+    const button = document.getElementById("submit-btn");
+    const statusBox = document.getElementById("status");
+
+    form.addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      statusBox.className = "";
+      statusBox.style.display = "none";
+
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      document.getElementById("submitted_at").value =
+        new Date().toLocaleString("pl-PL");
+
+      button.disabled = true;
+      button.textContent = "Wysyłanie...";
+
+      try {
+        await emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, form);
+        statusBox.textContent = "Dziękujemy. Zgłoszenie zostało wysłane.";
+        statusBox.className = "success";
+        form.reset();
+      } catch (error) {
+        console.error("EmailJS error:", error);
+        statusBox.textContent =
+          "Nie udało się wysłać zgłoszenia. Spróbuj ponownie lub skontaktuj się z nami w inny sposób.";
+        statusBox.className = "error";
+      } finally {
+        button.disabled = false;
+        button.textContent = "Wyślij zgłoszenie";
+      }
+    });
+  </script>
+</body>
+</html>
